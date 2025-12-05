@@ -1,0 +1,53 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete TODO{% endblock %}
+
+{% block extra_styles %}
+.delete-warning {
+    background: #fff5f5;
+    border: 1px solid #fc8181;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.delete-warning h2 {
+    color: #c53030;
+    margin-bottom: 10px;
+}
+.todo-preview {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+}
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+{% endblock %}
+
+{% block content %}
+<h1>Delete TODO</h1>
+
+<div class="delete-warning">
+    <h2>⚠️ Are you sure?</h2>
+    <p>This action cannot be undone. The following TODO will be permanently deleted:</p>
+    
+    <div class="todo-preview">
+        <strong>{{ todo.title }}</strong>
+        {% if todo.description %}
+            <p>{{ todo.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'todo_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}TODO List{% endblock %}
+
+{% block extra_styles %}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.todo-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+.todo-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.todo-item.resolved {
+    background: #f0fdf4;
+    opacity: 0.8;
+}
+.todo-item.overdue {
+    border-left: 4px solid #f56565;
+}
+.todo-content {
+    flex: 1;
+}
+.todo-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.todo-title.resolved {
+    text-decoration: line-through;
+    color: #718096;
+}
+.todo-description {
+    color: #718096;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.todo-meta {
+    font-size: 12px;
+    color: #a0aec0;
+}
+.due-date {
+    color: #ed8936;
+    font-weight: 500;
+}
+.due-date.overdue {
+    color: #f56565;
+}
+.todo-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #a0aec0;
+}
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>📝 My TODOs</h1>
+    <a href="{% url 'todo_create' %}" class="btn btn-primary">+ Add New TODO</a>
+</div>
+
+{% if todos %}
+    {% for todo in todos %}
+    <div class="todo-item {% if todo.is_resolved %}resolved{% endif %} {% if todo.is_overdue %}overdue{% endif %}">
+        <div class="todo-content">
+            <div class="todo-title {% if todo.is_resolved %}resolved{% endif %}">
+                {{ todo.title }}
+            </div>
+            {% if todo.description %}
+            <div class="todo-description">
+                {{ todo.description }}
+            </div>
+            {% endif %}
+            <div class="todo-meta">
+                {% if todo.due_date %}
+                    <span class="due-date {% if todo.is_overdue %}overdue{% endif %}">
+                        📅 Due: {{ todo.due_date|date:"M d, Y g:i A" }}
+                        {% if todo.is_overdue %}(Overdue!){% endif %}
+                    </span>
+                {% endif %}
+                • Created: {{ todo.created_at|date:"M d, Y" }}
+            </div>
+        </div>
+        <div class="todo-actions">
+            <form method="post" action="{% url 'todo_toggle_resolved' todo.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if todo.is_resolved %}btn-secondary{% else %}btn-success{% endif %}">
+                    {% if todo.is_resolved %}↩️ Unresolve{% else %}✓ Resolve{% endif %}
+                </button>
+            </form>
+            <a href="{% url 'todo_edit' todo.pk %}" class="btn btn-primary">Edit</a>
+            <a href="{% url 'todo_delete' todo.pk %}" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <h2>No TODOs yet!</h2>
+        <p>Click "Add New TODO" to get started.</p>
+    </div>
+{% endif %}
+{% endblock %}
