@@ -1,6 +1,6 @@
-<div align="center">
-[**Bahasa Indonesia**](#pengantar) | [**English**](#introduction)
-</div>
+<p align="center">
+  <a href="#pengantar"><strong>🇮🇩 Bahasa Indonesia</strong></a> | <a href="#introduction"><strong>🇺🇸 English</strong></a>
+</p>
 
 # AI Dev Tools Zoomcamp
 
@@ -16,13 +16,14 @@ Week1: Notes
 - Membuat aplikasi snaker game sederhana menggunakan React dengan menggunakan ChatGPT dan Claude 
 
 
-
+```bash
 npm install 
 npm install [apps]
 npm install -D postcss autoprefixer
 npm run dev
 
 npm install -g @anthropic-ai/claude-code
+```
 
 ---
 
