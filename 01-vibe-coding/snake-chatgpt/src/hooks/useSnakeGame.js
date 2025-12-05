@@ -15,16 +15,16 @@ export function useSnakeGame() {
   const [gameStarted, setGameStarted] = useState(false);
   const [wallMode, setWallMode] = useState(true);
 
-  const generateFood = useCallback(() => {
+  const generateFood = useCallback((currentSnake) => {
     let newFood;
     do {
       newFood = [
         Math.floor(Math.random() * GRID_SIZE),
         Math.floor(Math.random() * GRID_SIZE)
       ];
-    } while (snake.some(segment => segment[0] === newFood[0] && segment[1] === newFood[1]));
+    } while (currentSnake.some(segment => segment[0] === newFood[0] && segment[1] === newFood[1]));
     return newFood;
-  }, [snake]);
+  }, []);
 
   const resetGame = useCallback(() => {
     setSnake(INITIAL_SNAKE);
@@ -81,7 +81,7 @@ export function useSnakeGame() {
       // Check food collision
       if (newHead[0] === food[0] && newHead[1] === food[1]) {
         setScore(s => s + 10);
-        setFood(generateFood());
+        setFood(generateFood(newSnake));
         return newSnake;
       }
 
