@@ -1,132 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
+import { useSnakeGame } from './hooks/useSnakeGame';
 
-const GRID_SIZE = 20;
 const CELL_SIZE = 20;
-const INITIAL_SNAKE = [[10, 10]];
-const INITIAL_DIRECTION = { x: 1, y: 0 };
-const INITIAL_SPEED = 150;
 
 export default function SnakeGame() {
-  const [snake, setSnake] = useState(INITIAL_SNAKE);
-  const [direction, setDirection] = useState(INITIAL_DIRECTION);
-  const [food, setFood] = useState([15, 15]);
-  const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [wallMode, setWallMode] = useState(true);
-
-  const generateFood = useCallback(() => {
-    let newFood;
-    do {
-      newFood = [
-        Math.floor(Math.random() * GRID_SIZE),
-        Math.floor(Math.random() * GRID_SIZE)
-      ];
-    } while (snake.some(segment => segment[0] === newFood[0] && segment[1] === newFood[1]));
-    return newFood;
-  }, [snake]);
-
-  const resetGame = () => {
-    setSnake(INITIAL_SNAKE);
-    setDirection(INITIAL_DIRECTION);
-    setFood([15, 15]);
-    setGameOver(false);
-    setScore(0);
-    setIsPaused(false);
-    setGameStarted(true);
-  };
-
-  const moveSnake = useCallback(() => {
-    if (gameOver || isPaused || !gameStarted) return;
-
-    setSnake(prevSnake => {
-      const head = prevSnake[0];
-      let newHead = [head[0] + direction.x, head[1] + direction.y];
-
-      // Handle wall collision based on mode
-      if (wallMode) {
-        // Wall mode: game over on collision
-        if (newHead[0] < 0 || newHead[0] >= GRID_SIZE || newHead[1] < 0 || newHead[1] >= GRID_SIZE) {
-          setGameOver(true);
-          return prevSnake;
-        }
-      } else {
-        // Pass-through mode: wrap around
-        if (newHead[0] < 0) newHead[0] = GRID_SIZE - 1;
-        if (newHead[0] >= GRID_SIZE) newHead[0] = 0;
-        if (newHead[1] < 0) newHead[1] = GRID_SIZE - 1;
-        if (newHead[1] >= GRID_SIZE) newHead[1] = 0;
-      }
-
-      // Check self collision
-      if (prevSnake.some(segment => segment[0] === newHead[0] && segment[1] === newHead[1])) {
-        setGameOver(true);
-        return prevSnake;
-      }
-
-      const newSnake = [newHead, ...prevSnake];
-
-      // Check food collision
-      if (newHead[0] === food[0] && newHead[1] === food[1]) {
-        setScore(s => s + 10);
-        setFood(generateFood());
-        return newSnake;
-      }
-
-      newSnake.pop();
-      return newSnake;
-    });
-  }, [direction, food, gameOver, isPaused, gameStarted, generateFood, wallMode]);
-
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (!gameStarted && e.key === ' ') {
-        resetGame();
-        return;
-      }
-
-      if (e.key === ' ') {
-        setIsPaused(p => !p);
-        return;
-      }
-
-      if (isPaused || gameOver) return;
-
-      switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-          if (direction.y === 0) setDirection({ x: 0, y: -1 });
-          break;
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-          if (direction.y === 0) setDirection({ x: 0, y: 1 });
-          break;
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          if (direction.x === 0) setDirection({ x: -1, y: 0 });
-          break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          if (direction.x === 0) setDirection({ x: 1, y: 0 });
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [direction, isPaused, gameOver, gameStarted]);
-
-  useEffect(() => {
-    const interval = setInterval(moveSnake, INITIAL_SPEED);
-    return () => clearInterval(interval);
-  }, [moveSnake]);
+  const {
+    snake,
+    food,
+    score,
+    gameOver,
+    isPaused,
+    gameStarted,
+    wallMode,
+    resetGame,
+    toggleWallMode,
+    GRID_SIZE
+  } = useSnakeGame();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-900 to-green-700 p-8">
@@ -138,7 +27,7 @@ export default function SnakeGame() {
         <div className="flex items-center justify-center gap-3">
           <span className="text-gray-700 font-medium">Mode:</span>
           <button
-            onClick={() => setWallMode(!wallMode)}
+            onClick={toggleWallMode}
             className={`px-4 py-2 rounded-lg font-semibold transition ${
               wallMode 
                 ? 'bg-red-500 text-white hover:bg-red-600' 

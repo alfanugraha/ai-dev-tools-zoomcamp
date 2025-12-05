@@ -1,5 +1,5 @@
 <div align="center">
-[**Bahasa Indonesia**](#Pengantar) | [**English**](#Introduction)
+[**Bahasa Indonesia**](#pengantar) | [**English**](#introduction)
 </div>
 
 # AI Dev Tools Zoomcamp
